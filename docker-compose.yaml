@@ -1,0 +1,41 @@
+version: '3.6'
+services:
+  backend:
+      build: ./Api
+      depends_on:
+        - cassandra-node1
+        - cassandra-node2
+        - cassandra-node3  
+      ports:
+        - "3000:3000"
+  cassandra-node1:
+    image: bitnami/cassandra:4.0.4
+    environment:
+      - CASSANDRA_CLUSTER_NAME=cassandra-cluster
+      - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3
+      - CASSANDRA_PASSWORD_SEEDER=yes
+    ports:
+      - '9042:9042'
+
+  cassandra-node2:
+    image: bitnami/cassandra:4.0.4
+    environment:
+      - CASSANDRA_CLUSTER_NAME=cassandra-cluster
+      - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3
+    ports:
+      - '9142:9142'
+
+  cassandra-node3:
+    image: bitnami/cassandra:4.0.4
+    environment:
+      - CASSANDRA_CLUSTER_NAME=cassandra-cluster
+      - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3
+    ports:
+      - '9242:9242'
+volumes:
+  cassandra-node1:
+    driver: local
+  cassandra-node2:
+    driver: local
+  cassandra-node3:
+    driver: local
