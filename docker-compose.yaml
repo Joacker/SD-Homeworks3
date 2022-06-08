@@ -1,7 +1,7 @@
 version: '3.6'
 services:
   backend:
-      build: ./Api
+      build: ./server/api
       depends_on:
         - cassandra-node1
         - cassandra-node2
