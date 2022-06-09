@@ -1,13 +1,17 @@
 const { client } = require('../config/database')
 
-const usuarios = async (req,res) => {
-    //res.header("Access-Control-Allow-Origin","*");
-    const response = await poolPDF.query(`select * from encontrados;`);
-    console.log("Getting all clientes");
-    //console.log(response.rows[0].ip);
+const create = async (req,res) => {
+    
+    const { nombre, apellido, rut, email, fecha_nacimiento, comentario, farmacos, doctor } = req.body
+    client.execute(`SELECT * FROM paciente WHERE rut = ${rut}`, (err, result) => {
+
+    })
+
+
+
     res.json(response.rows);
 };
 
 module.exports = {
-    usuarios,
+    create,
 };
