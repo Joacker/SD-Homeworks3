@@ -1,5 +1,5 @@
 #################### VERSION ########################
-version: '3.6'
+version: '2'
 networks:
   lared:
     driver: bridge
@@ -17,7 +17,11 @@ services:
 ################## NODE1 ##############################
   cassandra-node1:
     image: bitnami/cassandra:4.0.4
+    volumes:
+      - ./init-scripts:/docker-entrypoint-initdb.d
     environment:
+      - CASSANDRA_USER=cassandra
+      - CASSANDRA_PASSWORD=cassandra
       - CASSANDRA_CLUSTER_NAME=cassandra-cluster
       - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3
       - CASSANDRA_PASSWORD_SEEDER=yes
