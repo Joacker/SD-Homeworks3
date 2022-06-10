@@ -1,30 +1,43 @@
+#################### VERSION ########################
 version: '3.6'
+networks:
+  lared:
+    driver: bridge
 services:
   backend:
-      build: ./server/api
+      build: ./server
       depends_on:
         - cassandra-node1
         - cassandra-node2
         - cassandra-node3  
+      networks:
+        - lared
       ports:
         - "3000:3000"
+################## NODE1 ##############################
   cassandra-node1:
     image: bitnami/cassandra:4.0.4
     environment:
       - CASSANDRA_CLUSTER_NAME=cassandra-cluster
       - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3
       - CASSANDRA_PASSWORD_SEEDER=yes
+    networks:
+      - lared
     ports:
       - '9042:9042'
 
+################## NODE2 ##############################
   cassandra-node2:
     image: bitnami/cassandra:4.0.4
     environment:
       - CASSANDRA_CLUSTER_NAME=cassandra-cluster
       - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3
+    networks:
+      - lared
     ports:
       - '9142:9142'
 
+################## NODE3 ##############################
   cassandra-node3:
     image: bitnami/cassandra:4.0.4
     environment:
@@ -32,6 +45,9 @@ services:
       - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3
     ports:
       - '9242:9242'
+    networks:
+      - lared
+################# VOLUMES #############################
 volumes:
   cassandra-node1:
     driver: local
