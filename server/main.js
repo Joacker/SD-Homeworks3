@@ -27,7 +27,7 @@ var host = process.env.PORT || '0.0.0.0';
 var PlainTextAuthProvider = cassandra.auth.PlainTextAuthProvider;
 
 const client = new cassandra.Client({
-  contactPoints: ['cassandra-node1'],
+  contactPoints: ['cassandra-node1','cassandra-node2','cassandra-node3'],
   localDataCenter: 'datacenter1',
   keyspace: 'sampledata',
   authProvider: new PlainTextAuthProvider('cassandra', 'cassandra')
