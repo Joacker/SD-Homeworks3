@@ -5,7 +5,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const bodyParser = require("body-parser");
 const cassandra = require('cassandra-driver');
-
+const dse = require('dse-driver');
 //-------------------------------------------
 
 /* CONFIGS */
@@ -22,13 +22,14 @@ app.use(cors());
 
 var port = process.env.PORT || 3000;
 var host = process.env.PORT || '0.0.0.0';
-//let authProvider = new cassandra.auth.PlainTextAuthProvider('Username', 'Password');
+//let authProvider = new cassandra.auth.PlainTextAuthProvider('cassandra', 'Password');
 ///////////////////////////////////////////////////////////////
+var PlainTextAuthProvider = cassandra.auth.PlainTextAuthProvider;
 
 const client = new cassandra.Client({
-  contactPoints: ['cassandra-cluster:9042', 'cassandra-cluster:9142', 'cassandra-cluster:9242'],
+  contactPoints: ['cassandra-node1'],
   localDataCenter: 'datacenter1',
-  keyspace: 'test',
+  keyspace: 'sampledata',
   authProvider: new PlainTextAuthProvider('cassandra', 'cassandra')
 });
 
@@ -36,10 +37,9 @@ app.get("/", (req, res) => {
   res.send("ola api");
 });
 let query = `SELECT * FROM months`
-app.post("/create", async (req, res) => {
-  const { nombre, apellido, rut, email, fecha_nacimiento, comentario, farmacos, doctor } = req.body
-  let parameters = [rut];
-    await client.execute(query,parameters, (error, result) => {
+
+app.get("/create", async (req, res) => {
+    await client.execute(query, (error, result) => {
       if (error != undefined) {
         console.log(error);
       }else {

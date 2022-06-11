@@ -1,11 +1,15 @@
 #################### VERSION ########################
-version: '2'
+version: '3'
 networks:
   lared:
     driver: bridge
 services:
   backend:
       build: ./server
+      environment:
+        - CASSANDRA_USER=cassandra
+        - CASSANDRA_PASSWORD=cassandra
+        - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3
       depends_on:
         - cassandra-node1
         - cassandra-node2
@@ -34,10 +38,15 @@ services:
   cassandra-node2:
     image: bitnami/cassandra:4.0.4
     environment:
+      - CASSANDRA_USER=cassandra
+      - CASSANDRA_PASSWORD=cassandra
       - CASSANDRA_CLUSTER_NAME=cassandra-cluster
       - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3
+      - CASSANDRA_PASSWORD_SEEDER=yes
     networks:
       - lared
+    links:
+      - cassandra-node1
     ports:
       - '9142:9142'
 
@@ -47,15 +56,9 @@ services:
     environment:
       - CASSANDRA_CLUSTER_NAME=cassandra-cluster
       - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3
-    ports:
-      - '9242:9242'
     networks:
       - lared
-################# VOLUMES #############################
-volumes:
-  cassandra-node1:
-    driver: local
-  cassandra-node2:
-    driver: local
-  cassandra-node3:
-    driver: local
+    links:
+      - cassandra-node1     
+    ports:
+      - '9242:9242'
