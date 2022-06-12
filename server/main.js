@@ -45,15 +45,48 @@ app.get("/", (req, res) => {
   res.send("ola api");
 });
 
-app.post('edit',(req,res)=>{
-  
+app.post('/edit',async (req,res)=>{
+  const query = 'select * from recetas where id = ? ALLOW FILTERING';
+  const recipe = reb.body;
+  await client2.execute(query, [recipe.id], { prepare: true }).then(result => {
+    if(result.rows[0] != undefined){
+    // Existe el registro, a Updatear
+    console.log(result.rows);
+    const query = `update 
+                     recetas 
+                        set 
+                            comentario = ?, 
+                            farmacos = ?,
+                            doctor = ? 
+                      where 
+                            id=?;`;
+    res.send(result.rows);
+  }
+
+  }).catch(err => {
+    console.log(err);
+    res.send(err);
+  });
 });
 
 app.post('/create', (req, res) => {
   (async () => {
     const query = 'SELECT * FROM pacientes WHERE rut=? ALLOW FILTERING';
-    const query2 = "INSERT INTO pacientes (id, nombre,apellido,rut,email,fecha_nacimiento) VALUES(?,?,?,?,?,?);";
-    const query3 = "INSERT INTO recetas (id, id_paciente,comentario,farmacos,doctor) VALUES(?,?,?,?,?);";
+    const query2 = `INSERT INTO 
+                               pacientes (id, 
+                                          nombre,
+                                          apellido,
+                                          rut,
+                                          email,
+                                          fecha_nacimiento) 
+                                          VALUES(?,?,?,?,?,?);`;
+    const query3 = `INSERT INTO 
+                               recetas (id, 
+                                        id_paciente,
+                                        comentario,
+                                        farmacos,
+                                        doctor) 
+                                        VALUES(?,?,?,?,?);`;
     const receta = req.body;
     var gen_id_1 = uuidv4();
     var gen_id_2 = uuidv4();
