@@ -45,6 +45,14 @@ app.get("/", (req, res) => {
   res.send("ola api");
 });
 
+app.get('/getRecipes', async(req, res) => {
+  
+  const query = 'SELECT * FROM recetas';
+  const result = await client.execute(query);
+  res.send(result.rows);
+}
+);
+
 app.post('/edit',async (req,res)=>{
   const query = 'select * from recetas where id = ? ALLOW FILTERING';
   const recipe = reb.body;
@@ -52,7 +60,7 @@ app.post('/edit',async (req,res)=>{
     if(result.rows[0] != undefined){
     // Existe el registro, a Updatear
     console.log(result.rows);
-    const query = `update 
+    const query2 = `update 
                      recetas 
                         set 
                             comentario = ?, 
@@ -60,9 +68,17 @@ app.post('/edit',async (req,res)=>{
                             doctor = ? 
                       where 
                             id=?;`;
+     client2.execute(query2,[recipe.comentario,recipe.farmacos,recipe.doctor,recipe.id]).then(result2 => {
+      res.send("RESULT: ",result2);
+      res.json("Recipe updated");
+    }
+    ).catch(err => {
+      res.send(err);
+    });
     res.send(result.rows);
+  }else{
+    res.json("Recipe not found");
   }
-
   }).catch(err => {
     console.log(err);
     res.send(err);
