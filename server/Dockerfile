@@ -11,7 +11,7 @@ COPY package*.json ./
 RUN npm install
 # If you are building your code for production
 # RUN npm ci --only=production
-RUN npm install express dse-driver request@2.81.0 dotenv cors body-parser nodemon avsc cassandra-driver
+RUN npm install uuid express dse-driver request@2.81.0 dotenv cors body-parser nodemon avsc cassandra-driver
 # Bundle app source
 COPY . .
 EXPOSE 3000
