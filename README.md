@@ -81,7 +81,7 @@ El cluster creado consta de 3 nodos y cada una tiene réplicas de las otras, por
 
 La red generada es eficiente en cuanto a la disponibilidad de datos y en la facilidad de escalabilidad, pero si se realiza una escalabilidad bastante considerable es muy probable que el rendimiento se vea afectado, ya que será muy lento navegar por muchos nodos encontrando la consulta
 
-cassandra-driver utiliza una política de balanceo de carga por defecto llamado DefaultLoadBalancingPolicy, el cual crea réplicas locales para una key determinada y si no está disponible, crea en el datacenter local nodos de forma round-robin.
+<code>cassandra-driver</code> utiliza una política de balanceo de carga por defecto llamado <code>DefaultLoadBalancingPolicy</code>, el cual crea réplicas locales para una key determinada y si no está disponible, crea en el datacenter local nodos de forma round-robin.
 
 - Cassandra posee principalmente dos estrategias para mantener redundancia en la replicación de datos. ¿Cuáles son estos? ¿Cuál es la ventaja de uno sobre otro? ¿Cuál utilizaría usted para en el caso actual y por qué? Justifique apropiadamente su respuesta.
 
