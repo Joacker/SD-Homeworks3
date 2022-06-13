@@ -48,41 +48,34 @@ app.get("/", (req, res) => {
 app.get('/getRecipes', async(req, res) => {
   
   const query = 'SELECT * FROM recetas';
-  const result = await client.execute(query);
-  res.send(result.rows);
+  const result = await client2.execute(query);
+  res.json(result.rows);
 }
 );
 
 app.post('/edit',async (req,res)=>{
   const query = 'select * from recetas where id = ? ALLOW FILTERING';
-  const recipe = reb.body;
-  await client2.execute(query, [recipe.id], { prepare: true }).then(result => {
+  const {id, comentario, farmacos,doctor} = req.body;
+  client2.execute(query, [id], { prepare: true }).then(result => {
     if(result.rows[0] != undefined){
     // Existe el registro, a Updatear
     console.log(result.rows);
-    const query2 = `update 
-                     recetas 
+    const query2 = `update recetas 
                         set 
                             comentario = ?, 
                             farmacos = ?,
                             doctor = ? 
                       where 
                             id=?;`;
-     client2.execute(query2,[recipe.comentario,recipe.farmacos,recipe.doctor,recipe.id]).then(result2 => {
-      res.send("RESULT: ",result2);
-      res.json("Recipe updated");
-    }
-    ).catch(err => {
-      res.send(err);
-    });
-    res.send(result.rows);
+      client2.execute(query2,[req.body.comentario,req.body.farmacos,req.body.doctor,req.body.id]).then(result2 => {
+        console.log(result2)
+        res.json("Recipe updated");
+    }).catch(err => {console.log(err);});
   }else{
     res.json("Recipe not found");
   }
   }).catch(err => {
-    console.log(err);
-    res.send(err);
-  });
+    console.log(err);})();
 });
 
 app.post('/create', (req, res) => {
