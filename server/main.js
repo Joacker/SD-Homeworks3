@@ -78,6 +78,25 @@ app.post('/edit',async (req,res)=>{
     console.log(err);})();
 });
 
+app.post('/delete',async (req,res)=>{
+  const query2 = 'select * from recetas where id = ? ALLOW FILTERING';
+  client2.execute(query2, [req.body.id], { prepare: true }).then(result => {
+    if(result.rows[0] != undefined){
+    // Existe el registro, a Deletear
+    const query = `delete from recetas where id=?;`;
+    console.log(result.rows);
+    client2.execute(query,[req.body.id]).then(result2 => {
+      console.log(result2)
+      res.json("Recipe deleted with id: "+req.body.id);
+    }).catch(err => {console.log(err);});
+    }else{
+      res.json("Recipe not found");
+    }
+  }).catch(err => {
+    console.log(err);}
+  )();
+});
+
 app.post('/create', (req, res) => {
   (async () => {
     const query = 'SELECT * FROM pacientes WHERE rut=? ALLOW FILTERING';
