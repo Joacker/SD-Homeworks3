@@ -80,11 +80,11 @@
 
 Casandra está construida con un sistema Peer-To-Peer. Los nodos se comunican o conectan a través de Gossip, este protocolo permite el intercambio de información entre nodos continuamente.
 
-Cassandra no utiliza una arquitectura maestro esclavo, ya que no existen nodos primarios o secundarios, es decir que todos los nodos tienen el mismo peso o tienen la misma prioridad. Sin embargo Cassandra utiliza una arquitectura tipo anillo, la cual se representa en la siguiente imagen:
+Cassandra no utiliza una arquitectura maestro esclavo, ya que no existen nodos primarios o secundarios, es decir que todos los nodos tienen el mismo peso o tienen la misma prioridad. Por otro lado, Cassandra utiliza una arquitectura tipo anillo, la cual se representa en la siguiente imagen:
 
 ![Alt text](https://refactorizando.com/wp-content/uploads/2020/11/Cassandra.png "arquitectura cassandra")
 
-Como se puede observar los nodos esta conectados entre si y cuentan con replicación de las bases de datos. 
+Como se puede observar cada nodo se conecta exactamente a otros dos nodos, formando una única ruta continua, para las señales a través de cada. Los datos viajan de un nodo a otro realizando replicación de estos. Este tipo de arquitecturas están pensadas para escalar las lecturas de forma que la carga se reparta entre varias máquinas.
 
 Cuando se realiza una petición a uno de los nodos, este actuará como cordinador y se encargará del direccionamiento de la petición generada. Luego se generan logs de los commit para la petición, donde se dirigiran a la MemTable para despues ser almacenados en disco en SSTable en cada uno de los nodos mediante el protocolo Gossip, esto permite que la disponibilidad de los datos sea sumamente alta, ya que la red red esta en sincronia continuamente.
 
