@@ -102,17 +102,17 @@ Dado la implementación actual que utiliza solo 1 datacenter, el cual contiene a
 
 - Teniendo en cuenta el contexto del problema ¿Usted cree que la solución propuesta es la correcta? ¿Qué ocurre cuando se quiere escalar en la solución? ¿Qué mejoras implementaría? Oriente su respuesta hacia el Sharding (la replicación/distribución de los datos) y comente una estrategia que podría seguir para ordenar los datos.
 
-La solución propuesta es correcta, pero si consideramos que se implementa en una clínica con muchos pacientes y muchas recetas escritas a la vez, este tendría problemas de cuello de botella, ya que existe solamente un punto en donde se pueden realizar las peticiones.
+La solución propuesta es correcta, pero si consideramos que se implementa en una clínica con millones de pacientes y millones de recetas escritas o cunsultadas a la vez, este tendría problemas de cuello de botella, ya que solo existen solamente 3 puntos en donde se pueden realizar estas peticiones, por lo tanto no será correcto tener tan pocos nodos.
 
-Si se escala de forma vertical se tendría que aumentar la memoria de los nodos para que puedan almacenar más datos. Por otro lado si se quiere escalar de forma horizontal se tendría que crear otro cluster con los mismos nodos que el primero y conectarlo con el culster anterior, esto produciría otro datacenter, por lo que se deberá aplicar la estrategia de NetworkTopologyStrategy para mantener la redundancia en la replicación de datos.
+Si se escala de forma vertical se tendría que aumentar la memoria de los nodos para que puedan almacenar más datos, con esta escalabilidad seguiríamos con el problema de cuello de botella. Por otro lado si se quiere escalar de forma horizontal se tendría que crear otro cluster con nodos de igual especificación que el primero y conectarlo con el culster anterior ya creado, esto produciría otro datacenter, esto solucionaría el problema de cuello de botella, ya que se tendrá mas puntos para recibir peticiones. Si se quiere aplicar una escalabilidad horizontal, se deberá aplicar la estrategia de NetworkTopologyStrategy para mantener la redundancia en la replicación de datos entre los nodos.
 
-Para realizar mejoras a la topología actual implementaríamos un sistema de Sharding, incrementando los cluster, de tal forma que haya una replicación por cada uno y al mismo tiempo un balanceo de carga entre ellos. Por ejemplo:
+Para realizar mejoras a la topología actual implementaríamos un sistema de Sharding, incrementando los cluster, es decir realizar un escalameinto horizontal, de tal forma que haya replicación en cada uno de los clusters y al mismo tiempo un balanceo de carga entre ellos. Por ejemplo:
 
 ![Alt text](images/topologia.png "topología")
 
-Los datos se distribuyen por los shard que hay en la topología. El config server almacena las rutas de los datos que contiene cada shard y aplica la política de distribución. Además todos los cluster contienen réplicas para la disponibilidad de los datos.
+Los datos se distribuyen por los shards que hay en la topología. El config server almacena las rutas de los datos que contiene cada shard y aplica una política de distribución de preferencia. Además todos los cluster contienen réplicas para la tener una mayor disponibilidad de los datos.
 
-Antes de realizar la petición, primero la API REST debe consultar a config server para saber cuál shar se la debe realizar.
+Antes de realizar la petición, primero la API REST debe consultar a config server para saber cuál shar se la debe realizar esta petición.
 
 ---
 [![Alt text](https://pbs.twimg.com/media/FQ3Ei63XwAAFH8c.jpg)](https://www.youtube.com/watch?v=qde6w2b2-Yo)
