@@ -12,6 +12,11 @@
     ```bash
     docker-compose up --build
     ```
+    Cassandra se demora en cargar, ya que se replica hay que esperar que inicie Cassandra de los 3 nodos y cargar las tablas correspondientes. Por ende para seguir hay que esperar que los 3 nodos esten cargados correctamente, de lo contrario habrán errores (por lo general en Windows se demora más). Cuando estén los 3 nodos listos, se observará el siguiente mensaje del nodo 1:
+
+    ![Alt text](images/cassandra_listo.png "Cassandra_listo")
+
+
 3) Crear un paciente con una receta nula en la siguiente ruta:
     ```url
     http://localhost:3000/create [POST]
@@ -75,19 +80,25 @@
 
 Casandra está construida con un sistema Peer-To-Peer. Los nodos se comunican o conectan a través de Gossip, este protocolo permite el intercambio de información entre nodos continuamente.
 
-Cuando se realiza una petición a uno de los nodos se generan logs de los commit en cada uno de los nodos, por lo tanto, la disponibilidad de los datos es sumamente alta.
+Cassandra no utiliza una arquitectura maestro esclavo, ya que no existen nodos primarios o secundarios, es decir que todos los nodos tienen el mismo peso o tienen la misma prioridad. Sin embargo Cassandra utiliza una arquitectura tipo anillo, la cual se representa en la siguiente imagen:
 
-El cluster creado consta de 3 nodos y cada una tiene réplicas de las otras, por lo tanto si se desconectará un solo nodo, no pasaría nada, pero si se desconectaran dos nodos y estos dos nodos son los que tienen la tabla paciente, se tendría perdida o falta de datos, ya que el nodo restante solo tiene las recetas.
+![Alt text](https://refactorizando.com/wp-content/uploads/2020/11/Cassandra.png "arquitectura cassandra")
 
-La red generada es eficiente en cuanto a la disponibilidad de datos y en la facilidad de escalabilidad, pero si se realiza una escalabilidad bastante considerable es muy probable que el rendimiento se vea afectado, ya que será muy lento navegar por muchos nodos encontrando la consulta
+Como se puede observar los nodos esta conectados entre si y cuentan con replicación de las bases de datos. 
 
-<code>cassandra-driver</code> utiliza una política de balanceo de carga por defecto llamado <code>DefaultLoadBalancingPolicy</code>, el cual crea réplicas locales para una key determinada y si no está disponible, crea en el datacenter local nodos de forma round-robin.
+Cuando se realiza una petición a uno de los nodos, este actuará como cordinador y se encargará del direccionamiento de la petición generada. Luego se generan logs de los commit para la petición, donde se dirigiran a la MemTable para despues ser almacenados en disco en SSTable en cada uno de los nodos mediante el protocolo Gossip, esto permite que la disponibilidad de los datos sea sumamente alta, ya que la red red esta en sincronia continuamente.
+
+El cluster creado consta de 3 nodos y cada una tiene réplicas de las otras (se puede apreciar en los init-script), por lo tanto si se desconectará un solo nodo, no pasaría nada, ya que además de tener las replicas, Cassandra posee sistemas de tolerancia a fallos como: Replica placement strategy y Snitch. Los cuales proporcionan estrategias de replicación y redireccion de consultas en caso de fallos. Cabe destacar que a momento de realizar alguna desconexion, esta será alertada por Gossip a los otros nodos.
+
+La red generada no es muy eficiente, ya que Cassandra esta construida para procesar una gran cantidad de datos, por lo tanto, es mas eficiente cuando se tiene un mayor poder de procesamiento de ram y una cantidad de datos considerable. Por otro lado, el modelo presenta una gran disponibilidad de datos y en la facilidad para la escalabilidad, pero si se realiza una escalabilidad bastante considerable es muy probable que el rendimiento se vea afectado, ya que, como es una red P2P, será muy lento navegar por tantos nodos encontrando la petición solicitada.
+
+Como Cassandra utiliza RabdomPartitioner como balanceador de carga por defecto, las peticionas realizadas son distribuidas de manera aleatoria utilizando un hash para las columnas llaves.
 
 - Cassandra posee principalmente dos estrategias para mantener redundancia en la replicación de datos. ¿Cuáles son estos? ¿Cuál es la ventaja de uno sobre otro? ¿Cuál utilizaría usted para en el caso actual y por qué? Justifique apropiadamente su respuesta.
 
-Las dos estrategias principales para mantener la redundancia en la replicación de datos son: SimpleStrategy y NetworkTopologyStrategy. La principal ventaja que tiene NetworkTopologyStrategy sobre SimpleStrategy es que se puede almacenar múltiples copias en diferentes datacenters.
+Las dos estrategias principales para mantener la redundancia en la replicación de datos son: SimpleStrategy y NetworkTopologyStrategy. NetworkTopologyStrategy genera hashes para calcular un arbol hash binario, llamado Merkle. SimpleStrategy coloca réplicas en nodos posteriores en el sentido de las agujas del reloj. Por último la principal ventaja que tiene NetworkTopologyStrategy sobre SimpleStrategy es que se puede almacenar múltiples copias en diferentes datacenters.
 
-Dado la implementación actual que utiliza solo 1 datacenter, el cual contiene a todos los nodos necesarios para el desarrollo de esta actividad. Utilizaríamos la estrategia SimpleStrategy por el simple hecho de que se posee solo un datacenter, también SimpleStrategy coloca los nodos en el sentido de las agujas del reloj, esto sería la topología propuesta en el enunciado de la tarea.
+Dado la implementación actual que utiliza solo 1 datacenter, el cual contiene a todos los nodos necesarios para el desarrollo de esta actividad. Utilizaríamos la estrategia SimpleStrategy por el simple hecho de que se posee solo un datacenter, también SimpleStrategy coloca los nodos en el sentido de las agujas del reloj, esto sería similar a la topología propuesta en el enunciado de la tarea.
 
 - Teniendo en cuenta el contexto del problema ¿Usted cree que la solución propuesta es la correcta? ¿Qué ocurre cuando se quiere escalar en la solución? ¿Qué mejoras implementaría? Oriente su respuesta hacia el Sharding (la replicación/distribución de los datos) y comente una estrategia que podría seguir para ordenar los datos.
 
