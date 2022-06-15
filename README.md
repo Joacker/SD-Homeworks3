@@ -6,7 +6,7 @@
 
 1) Clonar el repositorio.
     ```bash
-    https://github.com/Joacker/SD-Homeworks2.git
+    https://github.com/Joacker/SD-Homeworks3.git
     ```
 2) Iniciar contenedores.
     ```bash
