@@ -82,7 +82,9 @@ Casandra está construida con un sistema Peer-To-Peer. Los nodos se comunican o 
 
 Cassandra no utiliza una arquitectura maestro esclavo, ya que no existen nodos primarios o secundarios, es decir que todos los nodos tienen el mismo peso o tienen la misma prioridad. Por otro lado, Cassandra utiliza una arquitectura tipo anillo, la cual se representa en la siguiente imagen:
 
-![Alt text](https://refactorizando.com/wp-content/uploads/2020/11/Cassandra.png "arquitectura cassandra")
+<p align="center">
+  <img src="https://refactorizando.com/wp-content/uploads/2020/11/Cassandra.png">
+</p>
 
 Como se puede observar cada nodo se conecta exactamente a otros dos nodos, formando una única ruta continua, para las señales a través de cada. Los datos viajan de un nodo a otro realizando replicación de estos. Este tipo de arquitecturas están pensadas para escalar las lecturas de forma que la carga se reparta entre varias máquinas.
 
@@ -102,7 +104,7 @@ Dado la implementación actual que utiliza solo 1 datacenter, el cual contiene a
 
 - Teniendo en cuenta el contexto del problema ¿Usted cree que la solución propuesta es la correcta? ¿Qué ocurre cuando se quiere escalar en la solución? ¿Qué mejoras implementaría? Oriente su respuesta hacia el Sharding (la replicación/distribución de los datos) y comente una estrategia que podría seguir para ordenar los datos.
 
-La solución propuesta es correcta, pero si consideramos que se implementa en una clínica con millones de pacientes y millones de recetas escritas o cunsultadas a la vez, este tendría problemas de cuello de botella, ya que solo existen solamente 3 puntos en donde se pueden realizar estas peticiones, por lo tanto no será correcto tener tan pocos nodos.
+La solución propuesta es correcta a pequeña escala, pero si consideramos que se implementa en una clínica con millones de pacientes y millones de recetas escritas o cunsultadas a la vez, este tendría problemas de cuello de botella, ya que solo existen solamente 3 puntos en donde se pueden realizar estas peticiones, por lo tanto no será correcto tener tan pocos nodos.
 
 Si se escala de forma vertical se tendría que aumentar la memoria de los nodos para que puedan almacenar más datos, con esta escalabilidad seguiríamos con el problema de cuello de botella. Por otro lado si se quiere escalar de forma horizontal se tendría que crear otro cluster con nodos de igual especificación que el primero y conectarlo con el culster anterior ya creado, esto produciría otro datacenter, esto solucionaría el problema de cuello de botella, ya que se tendrá mas puntos para recibir peticiones. Si se quiere aplicar una escalabilidad horizontal, se deberá aplicar la estrategia de NetworkTopologyStrategy para mantener la redundancia en la replicación de datos entre los nodos.
 
