@@ -112,7 +112,7 @@ Para realizar mejoras a la topología actual implementaríamos un sistema de Sha
 
 ![Alt text](images/topologia.png "topología")
 
-Los datos se pueden distribuir por los shards, donde cada shard contiene tablas distintas, por ejemplo, la tabla de paciente en el shard 1 y la tabla de recetas en los shards 2 y 3, los cuales se pueden observar en la topología. El config server almacena las rutas de los datos que contiene cada shard y aplica una política de distribución de preferencia. Además todos los cluster contienen réplicas para tener una mayor disponibilidad de los datos.
+Los datos se pueden distribuir por los shards, donde cada shard contiene tablas distintas, por ejemplo, la tabla de paciente en el shard 1 y la tabla de recetas en los shards 2 y 3, la tabla recetas estará presente en más shard, ya que esta tabla recibirá más peticiones. El config server almacena las rutas de los datos que contiene cada shard y aplica una política de distribución de preferencia. Además todos los cluster contienen réplicas para tener una mayor disponibilidad de los datos.
 
 Antes de realizar la petición, primero la API REST debe consultar a config server para saber cuál shar se la debe realizar esta petición.
 
